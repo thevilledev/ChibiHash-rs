@@ -13,3 +13,6 @@ clean:
 
 bench:
 	cargo bench
+
+lint:
+	cargo clippy -- -D warnings
