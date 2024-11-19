@@ -2,3 +2,17 @@
 name = "chibihash"
 version = "0.1.0"
 edition = "2021"
+license = "MIT"
+authors = ["Ville Vesilehto <ville@vesilehto.fi>"]
+description = "A Rust implementation of the ChibiHash algorithm"
+repository = "https://github.com/thevilledev/ChibiHash-rs"
+documentation = "https://docs.rs/chibihash"
+keywords = ["hash", "chibi", "fast-hash", "non-cryptographic"]
+categories = ["algorithms", "no-std"]
+
+[dev-dependencies]
+criterion = { version = "0.5", features = ["html_reports"] }
+
+[[bench]]
+name = "bench"
+harness = false
