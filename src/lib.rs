@@ -125,8 +125,15 @@ pub enum ChibiHashError {
 impl std::fmt::Display for ChibiHashError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::InputTooLarge { size, max_supported } => {
-                write!(f, "Input size {} exceeds maximum supported size {}", size, max_supported)
+            Self::InputTooLarge {
+                size,
+                max_supported,
+            } => {
+                write!(
+                    f,
+                    "Input size {} exceeds maximum supported size {}",
+                    size, max_supported
+                )
             }
         }
     }
@@ -177,9 +184,12 @@ mod tests {
         let hash1 = chibi_hash64(data, 0);
         let hash2 = chibi_hash64(data, 0);
         assert_eq!(hash1, hash2, "Same input should produce same hash");
-        
+
         let hash3 = chibi_hash64(data, 1);
-        assert_ne!(hash1, hash3, "Different seeds should produce different hashes");
+        assert_ne!(
+            hash1, hash3,
+            "Different seeds should produce different hashes"
+        );
     }
 
     #[test]
@@ -190,10 +200,22 @@ mod tests {
         assert_eq!(chibi_hash64(b"", 55555).unwrap_or(0), 0x2EED9399FC4AC7E5);
         assert_eq!(chibi_hash64(b"hi", 0).unwrap_or(0), 0xAF98F3924F5C80D6);
         assert_eq!(chibi_hash64(b"123", 0).unwrap_or(0), 0x893A5CCA05B0A883);
-        assert_eq!(chibi_hash64(b"abcdefgh", 0).unwrap_or(0), 0x8F922660063E3E75);
-        assert_eq!(chibi_hash64(b"Hello, world!", 0).unwrap_or(0), 0x5AF920D8C0EBFE9F);
-        assert_eq!(chibi_hash64(b"qwertyuiopasdfghjklzxcvbnm123456", 0).unwrap_or(0), 0x2EF296DB634F6551);
-        assert_eq!(chibi_hash64(b"qwertyuiopasdfghjklzxcvbnm123456789", 0).unwrap_or(0), 0x0F56CF3735FFA943);
+        assert_eq!(
+            chibi_hash64(b"abcdefgh", 0).unwrap_or(0),
+            0x8F922660063E3E75
+        );
+        assert_eq!(
+            chibi_hash64(b"Hello, world!", 0).unwrap_or(0),
+            0x5AF920D8C0EBFE9F
+        );
+        assert_eq!(
+            chibi_hash64(b"qwertyuiopasdfghjklzxcvbnm123456", 0).unwrap_or(0),
+            0x2EF296DB634F6551
+        );
+        assert_eq!(
+            chibi_hash64(b"qwertyuiopasdfghjklzxcvbnm123456789", 0).unwrap_or(0),
+            0x0F56CF3735FFA943
+        );
     }
 
     #[test]
@@ -204,10 +226,18 @@ mod tests {
         "Hello, World!".hash(&mut hasher1);
         "Hello, World!".hash(&mut hasher2);
 
-        assert_eq!(hasher1.finish(), hasher2.finish(), "Same input should produce same hash");
+        assert_eq!(
+            hasher1.finish(),
+            hasher2.finish(),
+            "Same input should produce same hash"
+        );
 
         let mut hasher3 = ChibiHasher::new(1);
         "Hello, World!".hash(&mut hasher3);
-        assert_ne!(hasher1.finish(), hasher3.finish(), "Different seeds should produce different hashes");
+        assert_ne!(
+            hasher1.finish(),
+            hasher3.finish(),
+            "Different seeds should produce different hashes"
+        );
     }
 }

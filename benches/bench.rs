@@ -1,5 +1,5 @@
-use criterion::{black_box, criterion_group, criterion_main, Criterion, BenchmarkId};
 use chibihash::chibi_hash64;
+use criterion::{black_box, criterion_group, criterion_main, BenchmarkId, Criterion};
 
 fn bench_sizes(c: &mut Criterion) {
     let mut group = c.benchmark_group("input_sizes");
@@ -7,13 +7,9 @@ fn bench_sizes(c: &mut Criterion) {
     // Benchmark different input sizes
     for size in [8, 16, 32, 64, 128, 256, 512, 1024].iter() {
         let input = vec![0u8; *size];
-        group.bench_with_input(
-            BenchmarkId::from_parameter(size), 
-            &input,
-            |b, input| {
-                b.iter(|| chibi_hash64(black_box(input), black_box(0)))
-            }
-        );
+        group.bench_with_input(BenchmarkId::from_parameter(size), &input, |b, input| {
+            b.iter(|| chibi_hash64(black_box(input), black_box(0)))
+        });
     }
 
     group.finish();
@@ -32,15 +28,11 @@ pub fn bench_small_inputs(c: &mut Criterion) {
 pub fn bench_seeds(c: &mut Criterion) {
     let mut group = c.benchmark_group("different_seeds");
     let input = b"Hello, World!";
-    
+
     for seed in [0, 1, 42, u64::MAX].iter() {
-        group.bench_with_input(
-            BenchmarkId::new("seed", seed),
-            seed,
-            |b, &seed| {
-                b.iter(|| chibi_hash64(black_box(input), black_box(seed)))
-            }
-        );
+        group.bench_with_input(BenchmarkId::new("seed", seed), seed, |b, &seed| {
+            b.iter(|| chibi_hash64(black_box(input), black_box(seed)))
+        });
     }
 
     group.finish();
