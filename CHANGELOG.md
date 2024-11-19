@@ -7,19 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## v0.1.2 - 2024-11-19
+## [v0.1.2] - 2024-11-19
 
 - Bit rotation the Rust way
 - README improvements
 - Added CI
 
-## v0.1.1 - 2024-11-19
+## [v0.1.1] - 2024-11-19
 
 - Makefile changes
 - Linting and formatting
 - Fixed `creats.io` categories
 
-## v0.1.0 - 2024-11-19
+## [v0.1.0] - 2024-11-19
 
 - Initial release
 - Added benchmarks
