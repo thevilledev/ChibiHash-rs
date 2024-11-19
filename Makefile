@@ -1,6 +1,9 @@
 .PHONY: all test clean fmt bench
 
-all: test
+all: clean fmt test bench
+
+fmt:
+	cargo fmt
 
 test:
 	cargo test
