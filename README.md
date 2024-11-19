@@ -1,10 +1,27 @@
 # ChibiHash-rs
 
+[<img alt="crates.io" src="https://img.shields.io/crates/v/chibihash.svg?style=for-the-badge&color=fc8d62&logo=rust" height="20">](https://crates.io/crates/chibihash)
+[<img alt="docs.rs" src="https://img.shields.io/badge/docs.rs-chibihash-66c2a5?style=for-the-badge&labelColor=555555&logo=docs.rs" height="20">](https://docs.rs/chibihash)
+[<img alt="build status" src="https://img.shields.io/github/actions/workflow/status/thevilledev/chibihash-rs/test.yml?branch=main&style=for-the-badge" height="20">](https://github.com/thevilledev/chibihash-rs/actions?query=branch%3Amain)
+
 Rust port of [N-R-K/ChibiHash](https://github.com/N-R-K/ChibiHash). See the article [ChibiHash: A small, fast 64-bit hash function](https://nrk.neocities.org/articles/chibihash) for more information.
 
 See the original repository for more information, especially for when not to use ChibiHash.
 
 All credit for the algorithm goes to [N-R-K](https://github.com/N-R-K).
+
+## Example
+
+```rust
+use chibihash::ChibiHasher;
+use std::hash::Hasher;
+
+fn main() {
+  let mut hasher = ChibiHasher::new(42);
+  hasher.write(b"yellow world");
+  println!("{:016x}", hasher.finish());
+}
+```
 
 ## Tests
 
