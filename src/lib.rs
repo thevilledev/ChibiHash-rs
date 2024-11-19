@@ -57,7 +57,7 @@ pub fn chibi_hash64(key: &[u8], seed: u64) -> Result<u64, ChibiHashError> {
     }
 
     // Add length mix
-    h[0] = h[0].wrapping_add(((len as u64) << 32) | ((len as u64) >> 32));
+    h[0] = h[0].wrapping_add((len as u64).rotate_right(32));
 
     // Handle single byte if present
     if k.len() & 1 != 0 {
