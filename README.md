@@ -10,16 +10,31 @@ See the original repository for more information, especially for when not to use
 
 All credit for the algorithm goes to [N-R-K](https://github.com/N-R-K).
 
+## Features
+
+- 64-bit hash function
+- Deterministic
+- Fast
+- No dependencies
+- Two alternative ways to use the algorithm:
+  - Direct hashing via the `chibi_hash64()` function
+  - Hasher implementation for use with Rust's `std::hash::Hasher` trait
+
 ## Example
 
 ```rust
-use chibihash::ChibiHasher;
+use chibihash::{chibi_hash64, ChibiHasher};
 use std::hash::Hasher;
 
 fn main() {
-  let mut hasher = ChibiHasher::new(42);
-  hasher.write(b"yellow world");
-  println!("{:016x}", hasher.finish());
+    // Method 1: Direct hashing
+    let hash = chibi_hash64(b"yellow world", 42).expect("Failed to hash");
+    println!("Direct hash: {:016x}", hash);
+
+    // Method 2: Using Hasher trait
+    let mut hasher = ChibiHasher::new(42);
+    hasher.write(b"yellow world");
+    println!("Hasher trait: {:016x}", hasher.finish());
 }
 ```
 
