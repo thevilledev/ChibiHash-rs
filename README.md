@@ -16,14 +16,14 @@ All credit for the algorithm goes to [N-R-K](https://github.com/N-R-K).
 - Deterministic
 - Fast
 - No dependencies
-- Two alternative ways to use the algorithm:
+- Three alternative ways to use the algorithm:
   - Direct hashing via the `chibi_hash64()` function
   - Hasher implementation for use with Rust's `std::hash::Hasher` trait
-
+  - Streaming hashing via the `StreamingChibiHasher` struct, conforming to the `std::hash::Hasher` trait
 ## Example
 
 ```rust
-use chibihash::{chibi_hash64, ChibiHasher};
+use chibihash::{chibi_hash64, ChibiHasher, StreamingChibiHasher};
 use std::hash::Hasher;
 
 fn main() {
@@ -35,6 +35,12 @@ fn main() {
     let mut hasher = ChibiHasher::new(42);
     hasher.write(b"yellow world");
     println!("Hasher trait: {:016x}", hasher.finish());
+
+    // Method 3: Streaming hashing
+    let mut hasher = StreamingChibiHasher::new(0);
+    hasher.update(b"yellow ");
+    hasher.update(b"world");
+    println!("Streaming: {:016x}", hasher.finalize());
 }
 ```
 

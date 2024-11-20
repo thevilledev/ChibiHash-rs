@@ -7,7 +7,7 @@
 //!
 //! Basic usage:
 //! ```rust
-//! use chibihash::{chibi_hash64, ChibiHasher};
+//! use chibihash::{chibi_hash64, ChibiHasher, StreamingChibiHasher};
 //! use std::hash::Hasher;
 //!
 //! // Direct hashing
@@ -20,14 +20,21 @@
 //! let mut hasher = ChibiHasher::new(seed);
 //! hasher.write(key);
 //! println!("{:016x}", hasher.finish());
+//!
+//! // Streaming hashing
+//! let mut hasher1 = StreamingChibiHasher::new(0);
+//! hasher1.update(b"Hello, ");
+//! hasher1.update(b"World!");
+//! println!("{:016x}", hasher1.finalize());
 //! ```
 
 use std::hash::{Hash, Hasher};
 
+const P1: u64 = 0x2B7E151628AED2A5;
+const P2: u64 = 0x9E3793492EEDC3F7;
+const P3: u64 = 0x3243F6A8885A308D;
+
 pub fn chibi_hash64(key: &[u8], seed: u64) -> u64 {
-    const P1: u64 = 0x2B7E151628AED2A5;
-    const P2: u64 = 0x9E3793492EEDC3F7;
-    const P3: u64 = 0x3243F6A8885A308D;
 
     let mut h = [P1, P2, P3, seed];
     let len = key.len();
@@ -129,6 +136,136 @@ impl Hasher for ChibiHasher {
     }
 }
 
+/// Streaming ChibiHasher that processes data incrementally
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct StreamingChibiHasher {
+    h: [u64; 4],
+    buf: [u8; 32],
+    buf_len: usize,
+    total_len: u64,
+    seed: u64,
+}
+
+impl StreamingChibiHasher {
+    pub fn new(seed: u64) -> Self {
+        Self {
+            h: [P1, P2, P3, seed],
+            buf: [0; 32],
+            buf_len: 0,
+            total_len: 0,
+            seed,
+        }
+    }
+
+    pub fn update(&mut self, input: &[u8]) {
+        let mut p = input;
+        let mut l = p.len();
+
+        // If there's data in buf, try to fill it up
+        if self.buf_len > 0 {
+            while l > 0 && self.buf_len < 32 {
+                self.buf[self.buf_len] = p[0];
+                self.buf_len += 1;
+                p = &p[1..];
+                l -= 1;
+            }
+
+            // Flush if filled
+            if self.buf_len == 32 {
+                for i in 0..4 {
+                    let lane = load_u64_le(&self.buf[i * 8..]);
+                    self.h[i] ^= lane;
+                    self.h[i] = self.h[i].wrapping_mul(P1);
+                    self.h[(i + 1) & 3] ^= lane.rotate_left(40);
+                }
+                self.buf_len = 0;
+            }
+        }
+
+        // Process stripes, no copy
+        while l >= 32 {
+            for i in 0..4 {
+                let lane = load_u64_le(&p[i * 8..]);
+                self.h[i] ^= lane;
+                self.h[i] = self.h[i].wrapping_mul(P1);
+                self.h[(i + 1) & 3] ^= lane.rotate_left(40);
+            }
+            p = &p[32..];
+            l -= 32;
+        }
+
+        // Tail end of the input goes to the buffer
+        while l > 0 {
+            self.buf[self.buf_len] = p[0];
+            self.buf_len += 1;
+            p = &p[1..];
+            l -= 1;
+        }
+
+        self.total_len += input.len() as u64;
+    }
+
+    pub fn finalize(&self) -> u64 {
+        let mut h = self.h;
+        let mut p = &self.buf[..self.buf_len];
+        let mut l = self.buf_len;
+
+        h[0] = h[0].wrapping_add(self.total_len.rotate_right(32));
+
+        if l & 1 != 0 {
+            h[0] ^= p[0] as u64;
+            p = &p[1..];
+            l -= 1;
+        }
+        h[0] = h[0].wrapping_mul(P2);
+        h[0] ^= h[0] >> 31;
+
+        let mut i = 1;
+        while l >= 8 {
+            h[i] ^= load_u64_le(p);
+            h[i] = h[i].wrapping_mul(P2);
+            h[i] ^= h[i] >> 31;
+            p = &p[8..];
+            l -= 8;
+            i += 1;
+        }
+
+        i = 0;
+        while l >= 2 {
+            h[i] ^= u64::from(p[0]) | (u64::from(p[1]) << 8);
+            h[i] = h[i].wrapping_mul(P3);
+            h[i] ^= h[i] >> 31;
+            p = &p[2..];
+            l -= 2;
+            i += 1;
+        }
+
+        let mut x = self.seed;
+        x ^= h[0].wrapping_mul((h[2] >> 32) | 1);
+        x ^= h[1].wrapping_mul((h[3] >> 32) | 1);
+        x ^= h[2].wrapping_mul((h[0] >> 32) | 1);
+        x ^= h[3].wrapping_mul((h[1] >> 32) | 1);
+
+        x ^= x >> 27;
+        x = x.wrapping_mul(0x3C79AC492BA7B653);
+        x ^= x >> 33;
+        x = x.wrapping_mul(0x1C69B3F74AC4AE35);
+        x ^= x >> 27;
+
+        x
+    }
+}
+
+impl Hasher for StreamingChibiHasher {
+    fn finish(&self) -> u64 {
+        self.finalize()
+    }
+
+    fn write(&mut self, bytes: &[u8]) {
+        self.update(bytes);
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -188,5 +325,26 @@ mod tests {
             hasher3.finish(),
             "Different seeds should produce different hashes"
         );
+    }
+
+    #[test]
+    fn test_streaming() {
+        let mut hasher1 = StreamingChibiHasher::new(0);
+        hasher1.update(b"Hello, ");
+        hasher1.update(b"World!");
+        let hash1 = hasher1.finalize();
+
+        let mut hasher2 = StreamingChibiHasher::new(0);
+        hasher2.update(b"Hello, World!");
+        let hash2 = hasher2.finalize();
+
+        assert_eq!(hash1, hash2, "Streaming and single-shot should match");
+
+        // Verify it matches the simple hasher
+        let mut hasher3 = ChibiHasher::new(0);
+        hasher3.write(b"Hello, World!");
+        let hash3 = hasher3.finish();
+
+        assert_eq!(hash1, hash3, "Streaming and simple hasher should match");
     }
 }
