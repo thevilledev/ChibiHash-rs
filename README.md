@@ -28,7 +28,7 @@ use std::hash::Hasher;
 
 fn main() {
     // Method 1: Direct hashing
-    let hash = chibi_hash64(b"yellow world", 42).expect("Failed to hash");
+    let hash = chibi_hash64(b"yellow world", 42);
     println!("Direct hash: {:016x}", hash);
 
     // Method 2: Using Hasher trait
