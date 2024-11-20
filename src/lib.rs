@@ -35,7 +35,6 @@ const P2: u64 = 0x9E3793492EEDC3F7;
 const P3: u64 = 0x3243F6A8885A308D;
 
 pub fn chibi_hash64(key: &[u8], seed: u64) -> u64 {
-
     let mut h = [P1, P2, P3, seed];
     let len = key.len();
     let mut k = key;
@@ -139,15 +138,16 @@ impl Hasher for ChibiHasher {
 /// Streaming ChibiHasher that processes data incrementally
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct StreamingChibiHasher {
-    h: [u64; 4],
-    buf: [u8; 32],
-    buf_len: usize,
+    h: [u64; 4], // keep 8-byte aligned fields together
     total_len: u64,
     seed: u64,
+    buf: [u8; 32], // larger arrays later
+    buf_len: usize,
 }
 
 impl StreamingChibiHasher {
-    pub fn new(seed: u64) -> Self {
+    #[inline(always)]
+    pub const fn new(seed: u64) -> Self {
         Self {
             h: [P1, P2, P3, seed],
             buf: [0; 32],
@@ -221,7 +221,7 @@ impl StreamingChibiHasher {
         h[0] ^= h[0] >> 31;
 
         let mut i = 1;
-        while l >= 8 {
+        while l >= 8 && i < 4 { // bounds check
             h[i] ^= load_u64_le(p);
             h[i] = h[i].wrapping_mul(P2);
             h[i] ^= h[i] >> 31;
@@ -270,81 +270,10 @@ impl Hasher for StreamingChibiHasher {
 mod tests {
     use super::*;
 
+    // Keep only internal implementation tests here
     #[test]
-    fn test_basic_hashing() {
-        let data = b"Hello, World!";
-        let hash1 = chibi_hash64(data, 0);
-        let hash2 = chibi_hash64(data, 0);
-        assert_eq!(hash1, hash2, "Same input should produce same hash");
-
-        let hash3 = chibi_hash64(data, 1);
-        assert_ne!(
-            hash1, hash3,
-            "Different seeds should produce different hashes"
-        );
-    }
-
-    #[test]
-    // Tested against a Github comment from the original ChibiHash author
-    // See https://github.com/N-R-K/ChibiHash/issues/1#issuecomment-2486086163
-    fn test_real_world_examples() {
-        assert_eq!(chibi_hash64(b"", 0), 0x9EA80F3B18E26CFB);
-        assert_eq!(chibi_hash64(b"", 55555), 0x2EED9399FC4AC7E5);
-        assert_eq!(chibi_hash64(b"hi", 0), 0xAF98F3924F5C80D6);
-        assert_eq!(chibi_hash64(b"123", 0), 0x893A5CCA05B0A883);
-        assert_eq!(chibi_hash64(b"abcdefgh", 0), 0x8F922660063E3E75);
-        assert_eq!(chibi_hash64(b"Hello, world!", 0), 0x5AF920D8C0EBFE9F);
-        assert_eq!(
-            chibi_hash64(b"qwertyuiopasdfghjklzxcvbnm123456", 0),
-            0x2EF296DB634F6551
-        );
-        assert_eq!(
-            chibi_hash64(b"qwertyuiopasdfghjklzxcvbnm123456789", 0),
-            0x0F56CF3735FFA943
-        );
-    }
-
-    #[test]
-    fn test_hasher_trait() {
-        let mut hasher1 = ChibiHasher::new(0);
-        let mut hasher2 = ChibiHasher::new(0);
-
-        "Hello, World!".hash(&mut hasher1);
-        "Hello, World!".hash(&mut hasher2);
-
-        assert_eq!(
-            hasher1.finish(),
-            hasher2.finish(),
-            "Same input should produce same hash"
-        );
-
-        let mut hasher3 = ChibiHasher::new(1);
-        "Hello, World!".hash(&mut hasher3);
-        assert_ne!(
-            hasher1.finish(),
-            hasher3.finish(),
-            "Different seeds should produce different hashes"
-        );
-    }
-
-    #[test]
-    fn test_streaming() {
-        let mut hasher1 = StreamingChibiHasher::new(0);
-        hasher1.update(b"Hello, ");
-        hasher1.update(b"World!");
-        let hash1 = hasher1.finalize();
-
-        let mut hasher2 = StreamingChibiHasher::new(0);
-        hasher2.update(b"Hello, World!");
-        let hash2 = hasher2.finalize();
-
-        assert_eq!(hash1, hash2, "Streaming and single-shot should match");
-
-        // Verify it matches the simple hasher
-        let mut hasher3 = ChibiHasher::new(0);
-        hasher3.write(b"Hello, World!");
-        let hash3 = hasher3.finish();
-
-        assert_eq!(hash1, hash3, "Streaming and simple hasher should match");
+    fn test_load_u64_le() {
+        let bytes = [1, 2, 3, 4, 5, 6, 7, 8];
+        assert_eq!(load_u64_le(&bytes), 0x0807060504030201);
     }
 }
