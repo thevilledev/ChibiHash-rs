@@ -13,7 +13,7 @@
 //! // Direct hashing
 //! let key = b"Hello, World!";
 //! let seed = 1337;
-//! let hash = chibi_hash64(key, seed).unwrap_or(0);
+//! let hash = chibi_hash64(key, seed);
 //! println!("Hash of '{}' is: {:016x}", String::from_utf8_lossy(key), hash);
 //!
 //! // Using the Hasher trait
@@ -21,15 +21,10 @@
 //! hasher.write(key);
 //! println!("{:016x}", hasher.finish());
 //! ```
-//!
-//! # Safety and Performance
-//!
-//! This implementation is safe for inputs up to `usize::MAX / 2` bytes in length.
-//! Attempting to hash larger inputs will result in an error.
 
 use std::hash::{Hash, Hasher};
 
-pub fn chibi_hash64(key: &[u8], seed: u64) -> Result<u64, ChibiHashError> {
+pub fn chibi_hash64(key: &[u8], seed: u64) -> u64 {
     const P1: u64 = 0x2B7E151628AED2A5;
     const P2: u64 = 0x9E3793492EEDC3F7;
     const P3: u64 = 0x3243F6A8885A308D;
@@ -37,13 +32,6 @@ pub fn chibi_hash64(key: &[u8], seed: u64) -> Result<u64, ChibiHashError> {
     let mut h = [P1, P2, P3, seed];
     let len = key.len();
     let mut k = key;
-
-    if key.len() > usize::MAX / 2 {
-        return Err(ChibiHashError::InputTooLarge {
-            size: key.len(),
-            max_supported: usize::MAX / 2,
-        });
-    }
 
     // Process 32-byte chunks
     while k.len() >= 32 {
@@ -101,45 +89,13 @@ pub fn chibi_hash64(key: &[u8], seed: u64) -> Result<u64, ChibiHashError> {
     x = x.wrapping_mul(0x1C69B3F74AC4AE35);
     x ^= x >> 27;
 
-    Ok(x)
+    x
 }
 
 #[inline(always)]
 fn load_u64_le(bytes: &[u8]) -> u64 {
     u64::from_le_bytes(bytes[..8].try_into().unwrap())
 }
-
-/// Error type for hash computation failures
-#[derive(Debug, Clone, PartialEq, Eq)]
-#[non_exhaustive]
-pub enum ChibiHashError {
-    /// Input is too large to hash safely
-    InputTooLarge {
-        /// Size of the input that caused the error
-        size: usize,
-        /// Maximum safe size for input
-        max_supported: usize,
-    },
-}
-
-impl std::fmt::Display for ChibiHashError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            Self::InputTooLarge {
-                size,
-                max_supported,
-            } => {
-                write!(
-                    f,
-                    "Input size {} exceeds maximum supported size {}",
-                    size, max_supported
-                )
-            }
-        }
-    }
-}
-
-impl std::error::Error for ChibiHashError {}
 
 /// Configuration for the hash function
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -156,7 +112,7 @@ impl ChibiHasher {
         }
     }
 
-    pub fn hash(&self, input: &[u8]) -> Result<u64, ChibiHashError> {
+    pub fn hash(&self, input: &[u8]) -> u64 {
         chibi_hash64(input, self.seed)
     }
 }
@@ -164,8 +120,7 @@ impl ChibiHasher {
 impl Hasher for ChibiHasher {
     fn finish(&self) -> u64 {
         // Hash the accumulated bytes with our chibi_hash64 function
-        // If there's an error, fall back to a simple value
-        chibi_hash64(&self.buffer, self.seed).unwrap_or(self.seed)
+        chibi_hash64(&self.buffer, self.seed)
     }
 
     fn write(&mut self, bytes: &[u8]) {
@@ -196,24 +151,18 @@ mod tests {
     // Tested against a Github comment from the original ChibiHash author
     // See https://github.com/N-R-K/ChibiHash/issues/1#issuecomment-2486086163
     fn test_real_world_examples() {
-        assert_eq!(chibi_hash64(b"", 0).unwrap_or(0), 0x9EA80F3B18E26CFB);
-        assert_eq!(chibi_hash64(b"", 55555).unwrap_or(0), 0x2EED9399FC4AC7E5);
-        assert_eq!(chibi_hash64(b"hi", 0).unwrap_or(0), 0xAF98F3924F5C80D6);
-        assert_eq!(chibi_hash64(b"123", 0).unwrap_or(0), 0x893A5CCA05B0A883);
+        assert_eq!(chibi_hash64(b"", 0), 0x9EA80F3B18E26CFB);
+        assert_eq!(chibi_hash64(b"", 55555), 0x2EED9399FC4AC7E5);
+        assert_eq!(chibi_hash64(b"hi", 0), 0xAF98F3924F5C80D6);
+        assert_eq!(chibi_hash64(b"123", 0), 0x893A5CCA05B0A883);
+        assert_eq!(chibi_hash64(b"abcdefgh", 0), 0x8F922660063E3E75);
+        assert_eq!(chibi_hash64(b"Hello, world!", 0), 0x5AF920D8C0EBFE9F);
         assert_eq!(
-            chibi_hash64(b"abcdefgh", 0).unwrap_or(0),
-            0x8F922660063E3E75
-        );
-        assert_eq!(
-            chibi_hash64(b"Hello, world!", 0).unwrap_or(0),
-            0x5AF920D8C0EBFE9F
-        );
-        assert_eq!(
-            chibi_hash64(b"qwertyuiopasdfghjklzxcvbnm123456", 0).unwrap_or(0),
+            chibi_hash64(b"qwertyuiopasdfghjklzxcvbnm123456", 0),
             0x2EF296DB634F6551
         );
         assert_eq!(
-            chibi_hash64(b"qwertyuiopasdfghjklzxcvbnm123456789", 0).unwrap_or(0),
+            chibi_hash64(b"qwertyuiopasdfghjklzxcvbnm123456789", 0),
             0x0F56CF3735FFA943
         );
     }
