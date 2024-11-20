@@ -16,10 +16,10 @@ All credit for the algorithm goes to [N-R-K](https://github.com/N-R-K).
 - Deterministic
 - Fast
 - No dependencies
-- Three alternative ways to use the algorithm:
-  - Direct hashing via the `chibi_hash64()` function
-  - Hasher implementation for use with Rust's `std::hash::Hasher` trait
-  - Streaming hashing via the `StreamingChibiHasher` struct, conforming to the `std::hash::Hasher` trait
+- Three ways to use ChibiHash:
+  1. **Direct Hashing**: One-shot hashing using `chibi_hash64()`
+  2. **Simple Hasher**: Basic implementation using `ChibiHasher` (implements `std::hash::Hasher`)
+  3. **Streaming Hasher**: Memory-efficient streaming with `StreamingChibiHasher` (implements `std::hash::Hasher`)
 ## Example
 
 ```rust
