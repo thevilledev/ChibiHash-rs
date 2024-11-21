@@ -1,6 +1,6 @@
-.PHONY: all test clean fmt bench
+.PHONY: all test clean fmt bench bench-cross-lang
 
-all: clean fmt test bench
+all: clean fmt test bench bench-cross-lang
 
 fmt:
 	cargo fmt
@@ -12,7 +12,10 @@ clean:
 	cargo clean
 
 bench:
-	cargo bench
+	RUSTFLAGS="-C opt-level=3 -C target-cpu=native" cargo bench --bench bench
+
+bench-cross-lang:
+	RUSTFLAGS="-C opt-level=3 -C target-cpu=native" cargo bench --bench rust_vs_c
 
 lint:
 	cargo clippy -- -D warnings
