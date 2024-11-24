@@ -1,6 +1,6 @@
 [package]
 name = "chibihash"
-version = "0.2.0"
+version = "0.2.1"
 edition = "2021"
 license = "MIT"
 authors = ["Ville Vesilehto <ville@vesilehto.fi>"]
@@ -14,7 +14,10 @@ categories = ["algorithms"]
 criterion = { version = "0.5", features = ["html_reports"] }
 
 [build-dependencies]
-cc = "1.2.1"
+cc = { version = "1.2.1", optional = true }
+
+[features]
+ffi = ["cc"]
 
 [profile.release]
 opt-level = 3

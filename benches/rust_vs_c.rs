@@ -1,11 +1,15 @@
+#[cfg(feature = "ffi")]
 use criterion::{black_box, criterion_group, criterion_main, BenchmarkId, Criterion};
+#[cfg(feature = "ffi")]
 use std::ffi::c_void;
 
 // FFI declaration for the C implementation
+#[cfg(feature = "ffi")]
 extern "C" {
     fn chibihash64(key: *const c_void, len: isize, seed: u64) -> u64;
 }
 
+#[cfg(feature = "ffi")]
 fn bench_cross_language(c: &mut Criterion) {
     let mut group = c.benchmark_group("rust_vs_c");
     
@@ -117,5 +121,15 @@ fn bench_cross_language(c: &mut Criterion) {
     group.finish();
 }
 
+#[cfg(feature = "ffi")]
 criterion_group!(benches, bench_cross_language);
+
+#[cfg(feature = "ffi")]
 criterion_main!(benches);
+
+// Add this fallback main function for when FFI is disabled
+#[cfg(not(feature = "ffi"))]
+fn main() {
+    println!("This benchmark requires the 'ffi' feature to be enabled.");
+    println!("Please run with: cargo bench --features ffi");
+}
