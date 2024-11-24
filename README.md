@@ -50,9 +50,9 @@ Run `cargo test` to see the tests.
 
 Run `cargo bench` to see the benchmarks. See `target/criterion/report/index.html` for the HTML report.
 
-The repository also contains a benchmark comparing the Rust implementation to the C implementation. Run `cargo bench --features ffi` to see the benchmark. The C version can be found from the `csrc` directory.
+The repository also contains a benchmark comparing the Rust implementation to the C implementation. Run `cargo bench --features ffi` to see the benchmark. The C version can be found from the `csrc` directory. The benchmark utilises FFI to call the C version.
 
-Based on limited testing, the pure Rust implementation is faster than the C version when run through the FFI interface. Possibly due to the overhead of the FFI interface itself.
+Based on limited testing, the pure Rust implementation is faster than the C version when the input sizes are small (below 1024 bytes). With larger input sizes they are equal. Possibly due to the overhead of the FFI interface itself.
 
 ## When not to use ChibiHash
 
