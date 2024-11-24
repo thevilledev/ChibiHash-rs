@@ -6,8 +6,6 @@
 
 Rust port of [N-R-K/ChibiHash](https://github.com/N-R-K/ChibiHash). See the article [ChibiHash: A small, fast 64-bit hash function](https://nrk.neocities.org/articles/chibihash) for more information.
 
-See the original repository for more information, especially for when not to use ChibiHash.
-
 All credit for the algorithm goes to [N-R-K](https://github.com/N-R-K).
 
 ## Features
@@ -52,6 +50,22 @@ Run `cargo test` to see the tests.
 
 Run `cargo bench` to see the benchmarks. See `target/criterion/report/index.html` for the HTML report.
 
+The repository also contains a benchmark comparing the Rust implementation to the C implementation. Run `cargo bench --features ffi` to see the benchmark. The C version can be found from the `csrc` directory.
+
+Based on limited testing, the pure Rust implementation is faster than the C version when run through the FFI interface. Possibly due to the overhead of the FFI interface itself.
+
+## When not to use ChibiHash
+
+Copy-paste from the original repository. Same applies here.
+
+>Here are some reasons to avoid using this:
+>
+>* For cryptographic purposes.
+>* For protecting against [collision attacks](https://en.wikipedia.org/wiki/Collision_attack) (SipHash is the recommended one for this purpose).
+>* When you need very strong probability against collisions: ChibiHash does very
+>  minimal amount of mixing compared to other hashes (e.g xxhash64). And so
+>  chances of collision should in theory be higher.
+
 ## License
 
-MIT
+MIT. The original C version is under the Unlicense.
