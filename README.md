@@ -41,10 +41,16 @@ fn main() {
     hasher.update(b"world");
     println!("Streaming: {:016x}", hasher.finalize());
 
-    // Method 4: BuildHasher
+    // Method 4: BuildHasher for HashMap
+    let mut map: ChibiHashMap<String, i32> = ChibiHashMap::default();
+    map.insert("hello".to_string(), 42);
+    println!("BuildHasher HashMap: {:?}", map.get("hello"));
+
+    // Method 4: BuildHasher for HashSet
     let mut set: ChibiHashSet<String> = ChibiHashSet::default();
     set.insert("hello".to_string());
-    println!("BuildHasher: {}", set.contains("hello"));
+    println!("BuildHasher HashSet: {}", set.contains("hello"));
+
 }
 ```
 
