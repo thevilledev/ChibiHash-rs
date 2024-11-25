@@ -46,7 +46,7 @@ fn main() {
     map.insert("hello".to_string(), 42);
     println!("BuildHasher HashMap: {:?}", map.get("hello"));
 
-    // Method 4: BuildHasher for HashSet
+    // Method 5: BuildHasher for HashSet
     let mut set: ChibiHashSet<String> = ChibiHashSet::default();
     set.insert("hello".to_string());
     println!("BuildHasher HashSet: {}", set.contains("hello"));
