@@ -7,7 +7,7 @@
 //!
 //! Basic usage:
 //! ```rust
-//! use chibihash::{chibi_hash64, ChibiHasher, StreamingChibiHasher};
+//! use chibihash::{chibi_hash64, ChibiHasher, StreamingChibiHasher, ChibiHashMap, ChibiHashSet};
 //! use std::hash::Hasher;
 //!
 //! // Direct hashing
@@ -26,9 +26,25 @@
 //! hasher1.update(b"Hello, ");
 //! hasher1.update(b"World!");
 //! println!("{:016x}", hasher1.finalize());
+//!
+//! // Using BuildHasher as HashMap
+//! let mut map: ChibiHashMap<String, i32> = ChibiHashMap::default();
+//! map.insert("hello".to_string(), 42);
+//! println!("{:?}", map.get("hello"));
+//!
+//! // Using BuildHasher as HashSet
+//! let mut set: ChibiHashSet<String> = ChibiHashSet::default();
+//! set.insert("hello".to_string());
+//! println!("{}", set.contains("hello"));
+//!
+//! // Using BuildHasher as HashMap with custom seed
+//! let builder = ChibiHasher::new(42);
+//! let mut map: ChibiHashMap<String, i32> = ChibiHashMap::with_hasher(builder);
+//! map.insert("hello".to_string(), 42);
+//! println!("{:?}", map.get("hello"));
 //! ```
 
-use std::hash::{Hash, Hasher};
+use std::hash::{BuildHasher, Hash, Hasher};
 
 const P1: u64 = 0x2B7E151628AED2A5;
 const P2: u64 = 0x9E3793492EEDC3F7;
@@ -104,7 +120,7 @@ fn load_u64_le(bytes: &[u8]) -> u64 {
 }
 
 /// Configuration for the hash function
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Default, PartialEq, Eq, Hash)]
 pub struct ChibiHasher {
     seed: u64,
     buffer: Vec<u8>,
@@ -134,6 +150,20 @@ impl Hasher for ChibiHasher {
         self.buffer.extend_from_slice(bytes);
     }
 }
+
+impl BuildHasher for ChibiHasher {
+    type Hasher = ChibiHasher;
+
+    fn build_hasher(&self) -> Self::Hasher {
+        ChibiHasher::new(self.seed)
+    }
+}
+
+/// A HashMap that uses ChibiHash by default
+pub type ChibiHashMap<K, V> = std::collections::HashMap<K, V, ChibiHasher>;
+
+/// A HashSet that uses ChibiHash by default
+pub type ChibiHashSet<T> = std::collections::HashSet<T, ChibiHasher>;
 
 /// Streaming ChibiHasher that processes data incrementally
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -221,7 +251,8 @@ impl StreamingChibiHasher {
         h[0] ^= h[0] >> 31;
 
         let mut i = 1;
-        while l >= 8 && i < 4 { // bounds check
+        while l >= 8 && i < 4 {
+            // bounds check
             h[i] ^= load_u64_le(p);
             h[i] = h[i].wrapping_mul(P2);
             h[i] ^= h[i] >> 31;
