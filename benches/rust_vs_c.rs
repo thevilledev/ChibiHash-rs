@@ -12,7 +12,7 @@ extern "C" {
 #[cfg(feature = "ffi")]
 fn bench_cross_language(c: &mut Criterion) {
     let mut group = c.benchmark_group("rust_vs_c");
-    
+
     // Test different input patterns
     let test_cases = vec![
         ("zeros", vec![0u8; 1024]),
@@ -34,18 +34,13 @@ fn bench_cross_language(c: &mut Criterion) {
     for (pattern_name, pattern) in test_cases {
         for size in sizes.iter() {
             let input = &pattern[..*size];
-            
+
             // Benchmark Rust implementation
             group.bench_with_input(
                 BenchmarkId::new(format!("rust_{}", pattern_name), size),
                 &input,
                 |b, input| {
-                    b.iter(|| {
-                        black_box(chibihash::chibi_hash64(
-                            black_box(input),
-                            black_box(0)
-                        ))
-                    })
+                    b.iter(|| black_box(chibihash::chibi_hash64(black_box(input), black_box(0))))
                 },
             );
 
@@ -58,7 +53,7 @@ fn bench_cross_language(c: &mut Criterion) {
                         black_box(chibihash64(
                             black_box(input.as_ptr() as *const c_void),
                             black_box(input.len() as isize),
-                            black_box(0)
+                            black_box(0),
                         ))
                     })
                 },
@@ -75,17 +70,13 @@ fn bench_cross_language(c: &mut Criterion) {
         group.bench_with_input(
             BenchmarkId::new("rust_aligned", size),
             &aligned_data[..*size],
-            |b, input| {
-                b.iter(|| black_box(chibihash::chibi_hash64(black_box(input), 0)))
-            },
+            |b, input| b.iter(|| black_box(chibihash::chibi_hash64(black_box(input), 0))),
         );
 
         group.bench_with_input(
             BenchmarkId::new("rust_unaligned", size),
             &unaligned_data[..*size],
-            |b, input| {
-                b.iter(|| black_box(chibihash::chibi_hash64(black_box(input), 0)))
-            },
+            |b, input| b.iter(|| black_box(chibihash::chibi_hash64(black_box(input), 0))),
         );
 
         // Same for C implementation
@@ -97,7 +88,7 @@ fn bench_cross_language(c: &mut Criterion) {
                     black_box(chibihash64(
                         black_box(input.as_ptr() as *const c_void),
                         black_box(input.len() as isize),
-                        0
+                        0,
                     ))
                 })
             },
@@ -111,7 +102,7 @@ fn bench_cross_language(c: &mut Criterion) {
                     black_box(chibihash64(
                         black_box(input.as_ptr() as *const c_void),
                         black_box(input.len() as isize),
-                        0
+                        0,
                     ))
                 })
             },

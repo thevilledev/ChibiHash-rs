@@ -18,10 +18,11 @@ All credit for the algorithm goes to [N-R-K](https://github.com/N-R-K).
   1. **Direct Hashing**: One-shot hashing using `chibi_hash64()`
   2. **Simple Hasher**: Basic implementation using `ChibiHasher` (implements `std::hash::Hasher`)
   3. **Streaming Hasher**: Memory-efficient streaming with `StreamingChibiHasher` (implements `std::hash::Hasher`)
+  4. **BuildHasher**: `ChibiHasher` implements `BuildHasher`. This allows using ChibiHash as the default hasher for `std::collections::HashMap` and `std::collections::HashSet`. Use `ChibiHashMap` and `ChibiHashSet` types.
 ## Example
 
 ```rust
-use chibihash::{chibi_hash64, ChibiHasher, StreamingChibiHasher};
+use chibihash::{chibi_hash64, ChibiHasher, StreamingChibiHasher, ChibiHashMap, ChibiHashSet};
 use std::hash::Hasher;
 
 fn main() {
@@ -39,6 +40,11 @@ fn main() {
     hasher.update(b"yellow ");
     hasher.update(b"world");
     println!("Streaming: {:016x}", hasher.finalize());
+
+    // Method 4: BuildHasher
+    let mut set: ChibiHashSet<String> = ChibiHashSet::default();
+    set.insert("hello".to_string());
+    println!("BuildHasher: {}", set.contains("hello"));
 }
 ```
 

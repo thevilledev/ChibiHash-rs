@@ -10,11 +10,11 @@ fn test_streaming_matches_direct() {
     // Helper function to test streaming vs direct
     fn test_streaming(input: &[u8], seed: u64) {
         let direct = chibi_hash64(input, seed);
-        
+
         let mut streaming = StreamingChibiHasher::new(seed);
         streaming.update(input);
         let streaming_result = streaming.finalize();
-        
+
         assert_eq!(
             direct, streaming_result,
             "Streaming and direct hashing mismatch for input: {:?}, seed: {}",

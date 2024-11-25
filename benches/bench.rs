@@ -50,13 +50,9 @@ pub fn bench_streaming(c: &mut Criterion) {
         let input = vec![0u8; *size];
 
         // Single-shot benchmark
-        group.bench_with_input(
-            BenchmarkId::new("single_shot", size),
-            &input,
-            |b, input| {
-                b.iter(|| chibi_hash64(black_box(input), black_box(0)))
-            }
-        );
+        group.bench_with_input(BenchmarkId::new("single_shot", size), &input, |b, input| {
+            b.iter(|| chibi_hash64(black_box(input), black_box(0)))
+        });
 
         // Streaming benchmark - single update
         group.bench_with_input(
@@ -68,7 +64,7 @@ pub fn bench_streaming(c: &mut Criterion) {
                     hasher.update(black_box(input));
                     hasher.finalize()
                 })
-            }
+            },
         );
 
         // Streaming benchmark - split updates
@@ -85,7 +81,7 @@ pub fn bench_streaming(c: &mut Criterion) {
                         hasher.update(black_box(second));
                         hasher.finalize()
                     })
-                }
+                },
             );
         }
     }
@@ -112,7 +108,7 @@ pub fn bench_streaming_small_chunks(c: &mut Criterion) {
                     }
                     hasher.finalize()
                 })
-            }
+            },
         );
     }
 
@@ -128,7 +124,8 @@ pub fn bench_streaming_realistic(c: &mut Criterion) {
     group.bench_function("file_chunks_32k", |b| {
         b.iter(|| {
             let mut hasher = StreamingChibiHasher::new(0);
-            for chunk in large_input.chunks(32 * 1024) { // 32KB chunks
+            for chunk in large_input.chunks(32 * 1024) {
+                // 32KB chunks
                 hasher.update(black_box(chunk));
             }
             hasher.finalize()

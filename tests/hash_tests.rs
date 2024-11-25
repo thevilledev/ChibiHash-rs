@@ -1,7 +1,7 @@
 //! Tests for the ChibiHash algorithm
 //! Direct hashing
 
-use chibihash::{chibi_hash64, ChibiHasher, StreamingChibiHasher};
+use chibihash::{chibi_hash64, ChibiHashMap, ChibiHashSet, ChibiHasher, StreamingChibiHasher};
 use std::hash::{Hash, Hasher};
 
 #[test]
@@ -48,11 +48,11 @@ fn test_streaming_matches_direct() {
     // Helper function to test streaming vs direct
     fn test_streaming(input: &[u8], seed: u64) {
         let direct = chibi_hash64(input, seed);
-        
+
         let mut streaming = StreamingChibiHasher::new(seed);
         streaming.update(input);
         let streaming_result = streaming.finalize();
-        
+
         assert_eq!(
             direct, streaming_result,
             "Streaming and direct hashing mismatch for input: {:?}, seed: {}",
@@ -79,4 +79,18 @@ fn test_streaming_matches_direct() {
         chibi_hash64(b"Hello, world!", 0),
         "Split streaming should match direct"
     );
+}
+
+#[test]
+fn test_chibi_hash_map() {
+    let mut map: ChibiHashMap<String, i32> = ChibiHashMap::default();
+    map.insert("hello".to_string(), 42);
+    assert_eq!(map.get("hello"), Some(&42));
+}
+
+#[test]
+fn test_chibi_hash_set() {
+    let mut set: ChibiHashSet<String> = ChibiHashSet::default();
+    set.insert("hello".to_string());
+    assert!(set.contains("hello"));
 }
