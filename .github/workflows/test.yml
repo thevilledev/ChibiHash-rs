@@ -35,5 +35,11 @@ jobs:
       - name: Lint
         run: make lint
 
-      - name: Test
-        run: make test
+      - name: Format check
+        run: make fmt-check
+
+      - name: Test (std)
+        run: make test-std
+
+      - name: Test (no-std)
+        run: make test-no-std

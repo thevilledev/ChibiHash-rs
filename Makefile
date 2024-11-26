@@ -1,15 +1,22 @@
-.PHONY: all test clean fmt bench bench-cross-lang
+.PHONY: all test clean fmt fmt-check bench bench-cross-lang
 
 all: clean fmt test bench bench-cross-lang
 
 fmt:
 	cargo fmt
 
-test:
+fmt-check:
+	cargo fmt --check
+
+test: test-std test-no-std
+
+test-std:
 	@echo
 	@echo "*** Testing with default features ***"
 	@echo
 	@cargo test
+
+test-no-std:
 	@echo
 	@echo "*** Testing without default features ***"
 	@echo
