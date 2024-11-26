@@ -44,7 +44,28 @@
 //! println!("{:?}", map.get("hello"));
 //! ```
 
+#![cfg_attr(not(feature = "std"), no_std)]
+
+#[cfg(not(feature = "std"))]
+extern crate alloc;
+
+#[cfg(not(feature = "std"))]
+use hashbrown::{HashMap as BaseHashMap, HashSet as BaseHashSet};
+#[cfg(feature = "std")]
+use std::collections::{HashMap as BaseHashMap, HashSet as BaseHashSet};
+
+#[cfg(not(feature = "std"))]
+use core::hash::{BuildHasher, Hash, Hasher};
+#[cfg(feature = "std")]
 use std::hash::{BuildHasher, Hash, Hasher};
+
+#[cfg(not(feature = "std"))]
+use alloc::vec::Vec;
+
+#[cfg(not(feature = "std"))]
+use core::convert::TryInto;
+#[cfg(feature = "std")]
+use std::convert::TryInto;
 
 const P1: u64 = 0x2B7E151628AED2A5;
 const P2: u64 = 0x9E3793492EEDC3F7;
@@ -160,10 +181,10 @@ impl BuildHasher for ChibiHasher {
 }
 
 /// A HashMap that uses ChibiHash by default
-pub type ChibiHashMap<K, V> = std::collections::HashMap<K, V, ChibiHasher>;
+pub type ChibiHashMap<K, V> = BaseHashMap<K, V, ChibiHasher>;
 
 /// A HashSet that uses ChibiHash by default
-pub type ChibiHashSet<T> = std::collections::HashSet<T, ChibiHasher>;
+pub type ChibiHashSet<T> = BaseHashSet<T, ChibiHasher>;
 
 /// Streaming ChibiHasher that processes data incrementally
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -306,5 +327,13 @@ mod tests {
     fn test_load_u64_le() {
         let bytes = [1, 2, 3, 4, 5, 6, 7, 8];
         assert_eq!(load_u64_le(&bytes), 0x0807060504030201);
+    }
+
+    #[test]
+    #[cfg(not(feature = "std"))]
+    fn test_no_std() {
+        let key = b"abcdefgh";
+        let hash = chibi_hash64(key, 0);
+        assert_eq!(hash, 0x8F922660063E3E75);
     }
 }
