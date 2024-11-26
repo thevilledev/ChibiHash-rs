@@ -6,7 +6,14 @@ fmt:
 	cargo fmt
 
 test:
-	cargo test
+	@echo
+	@echo "*** Testing with default features ***"
+	@echo
+	@cargo test
+	@echo
+	@echo "*** Testing without default features ***"
+	@echo
+	@cargo test --no-default-features
 
 clean:
 	cargo clean
