@@ -34,7 +34,11 @@ fn test_streaming_matches_direct() {
     test_streaming(b"abcdefgh", 0, 0x8F922660063E3E75);
     test_streaming(b"Hello, world!", 0, 0x5AF920D8C0EBFE9F);
     test_streaming(b"qwertyuiopasdfghjklzxcvbnm123456", 0, 0x2EF296DB634F6551);
-    test_streaming(b"qwertyuiopasdfghjklzxcvbnm123456789", 0, 0x0F56CF3735FFA943);
+    test_streaming(
+        b"qwertyuiopasdfghjklzxcvbnm123456789",
+        0,
+        0x0F56CF3735FFA943,
+    );
 
     // Also test splitting the input in different ways
     let mut streaming = StreamingChibiHasher::new(0);
