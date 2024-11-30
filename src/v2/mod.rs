@@ -18,7 +18,7 @@
 //!
 //! Basic usage:
 //! ```rust
-//! use chibihash::v2::{chibi_hash64, ChibiHasher};
+//! use chibihash::v2::{chibi_hash64, ChibiHasher, ChibiHashMap, ChibiHashSet};
 //! use std::hash::Hasher;
 //!
 //! // Direct hashing
@@ -31,10 +31,31 @@
 //! let mut hasher = ChibiHasher::new(seed);
 //! hasher.write(key);
 //! println!("{:016x}", hasher.finish());
+//!
+//! // Using BuildHasher as HashMap
+//! let mut map: ChibiHashMap<String, i32> = ChibiHashMap::default();
+//! map.insert("hello".to_string(), 42);
+//! println!("{:?}", map.get("hello"));
+//!
+//! // Using BuildHasher as HashSet
+//! let mut set: ChibiHashSet<String> = ChibiHashSet::default();
+//! set.insert("hello".to_string());
+//! println!("{}", set.contains("hello"));
+//!
+//! // Using BuildHasher as HashMap with custom seed
+//! let builder = ChibiHasher::new(42);
+//! let mut map: ChibiHashMap<String, i32> = ChibiHashMap::with_hasher(builder);
+//! map.insert("hello".to_string(), 42);
+//! println!("{:?}", map.get("hello"));
 //! ```
 
 #[cfg(not(feature = "std"))]
 extern crate alloc;
+
+#[cfg(not(feature = "std"))]
+use hashbrown::{HashMap as BaseHashMap, HashSet as BaseHashSet};
+#[cfg(feature = "std")]
+use std::collections::{HashMap as BaseHashMap, HashSet as BaseHashSet};
 
 #[cfg(not(feature = "std"))]
 use core::hash::{BuildHasher, Hash, Hasher};
@@ -160,6 +181,12 @@ impl BuildHasher for ChibiHasher {
     }
 }
 
+/// A HashMap that uses ChibiHash by default
+pub type ChibiHashMap<K, V> = BaseHashMap<K, V, ChibiHasher>;
+
+/// A HashSet that uses ChibiHash by default
+pub type ChibiHashSet<T> = BaseHashSet<T, ChibiHasher>;
+
 #[inline(always)]
 fn load_u32_le(bytes: &[u8]) -> u64 {
     u32::from_le_bytes(bytes[..4].try_into().unwrap()) as u64
@@ -174,6 +201,12 @@ mod tests {
     fn test_load_u64_le() {
         let bytes = [1, 2, 3, 4, 5, 6, 7, 8];
         assert_eq!(load_u64_le(&bytes), 0x0807060504030201);
+    }
+
+    #[test]
+    fn test_load_u32_le() {
+        let bytes = [1, 2, 3, 4];
+        assert_eq!(load_u32_le(&bytes), 0x04030201);
     }
 
     #[test]
@@ -200,5 +233,19 @@ mod tests {
         for (input, seed, expected) in test_cases {
             assert_eq!(chibi_hash64(input.as_bytes(), seed), expected);
         }
+    }
+
+    #[test]
+    fn test_chibi_hash_map() {
+        let mut map: ChibiHashMap<String, i32> = ChibiHashMap::default();
+        map.insert("hello".to_string(), 42);
+        assert_eq!(map.get("hello"), Some(&42));
+    }
+
+    #[test]
+    fn test_chibi_hash_set() {
+        let mut set: ChibiHashSet<String> = ChibiHashSet::default();
+        set.insert("hello".to_string());
+        assert!(set.contains("hello"));
     }
 }
