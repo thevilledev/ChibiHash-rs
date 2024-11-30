@@ -1,4 +1,6 @@
-use chibihash::{chibi_hash64, StreamingChibiHasher};
+// Benchmark the `v1` version of the algorithm
+
+use chibihash::v1::{chibi_hash64, StreamingChibiHasher};
 use criterion::{black_box, criterion_group, criterion_main, BenchmarkId, Criterion};
 
 fn bench_sizes(c: &mut Criterion) {

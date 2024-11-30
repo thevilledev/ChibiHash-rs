@@ -1,12 +1,48 @@
-//! Tests for the ChibiHash algorithm
-//! Streaming hashing
-
-use chibihash::{chibi_hash64, StreamingChibiHasher};
+//! Integration tests for the crate
+//! This ensures that the default implementation works as expected
+//! It will use the `v1` version of the algorithm
+use chibihash::{chibi_hash64, ChibiHasher, StreamingChibiHasher, ChibiHashMap, ChibiHashSet};
+use core::hash::{Hash, Hasher};
 
 #[test]
-// Tested against a Github comment from the original ChibiHash author
-// See https://github.com/N-R-K/ChibiHash/issues/1#issuecomment-2486086163
-fn test_streaming_matches_direct() {
+fn test_default_basic_hashing() {
+    let data = b"Hello, World!";
+    let hash1 = chibi_hash64(data, 0);
+    let hash2 = chibi_hash64(data, 0);
+    assert_eq!(hash1, hash2, "Same input should produce same hash");
+
+    let hash3 = chibi_hash64(data, 1);
+    assert_ne!(
+        hash1, hash3,
+        "Different seeds should produce different hashes"
+    );
+}
+
+#[test]
+fn test_default_hasher_trait() {
+    let mut hasher1 = ChibiHasher::new(0);
+    let mut hasher2 = ChibiHasher::new(0);
+
+    "Hello, World!".hash(&mut hasher1);
+    "Hello, World!".hash(&mut hasher2);
+
+    assert_eq!(
+        hasher1.finish(),
+        hasher2.finish(),
+        "Same input should produce same hash"
+    );
+
+    let mut hasher3 = ChibiHasher::new(1);
+    "Hello, World!".hash(&mut hasher3);
+    assert_ne!(
+        hasher1.finish(),
+        hasher3.finish(),
+        "Different seeds should produce different hashes"
+    );
+}
+
+#[test]
+fn test_default_streaming_matches_direct() {
     // Helper function to test streaming vs direct and verify known values
     fn test_streaming(input: &[u8], seed: u64, expected: u64) {
         let direct = chibi_hash64(input, seed);
@@ -49,4 +85,18 @@ fn test_streaming_matches_direct() {
         0x5AF920D8C0EBFE9F,
         "Split streaming should match known value"
     );
+}
+
+#[test]
+fn test_default_chibi_hash_map() {
+    let mut map: ChibiHashMap<String, i32> = ChibiHashMap::default();
+    map.insert("hello".to_string(), 42);
+    assert_eq!(map.get("hello"), Some(&42));
+}
+
+#[test]
+fn test_default_chibi_hash_set() {
+    let mut set: ChibiHashSet<String> = ChibiHashSet::default();
+    set.insert("hello".to_string());
+    assert!(set.contains("hello"));
 }
