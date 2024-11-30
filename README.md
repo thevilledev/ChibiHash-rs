@@ -8,6 +8,20 @@ Rust port of [N-R-K/ChibiHash](https://github.com/N-R-K/ChibiHash). See the arti
 
 All credit for the algorithm goes to [N-R-K](https://github.com/N-R-K).
 
+## Versioning
+
+Since crate version `0.4.0` the crate offers two versions of the algorithm:
+
+- `v1` is the original implementation and the default one.
+- `v2` is a new implementation with better performance and passes all tests in [smhasher3](https://github.com/rurban/smhasher/tree/master/smhasher3).
+
+If you import the crate without any version specifier, the `v1` version is used.
+The `v1` version can also be explicitly selected by importing `chibihash::v1::*` instead.
+
+If you want the latest and greatest version, you can import `chibihash::v2::*`.
+
+The `v2` version will be the default in the next major version.
+
 ## Features
 
 - 64-bit hash function
@@ -18,8 +32,9 @@ All credit for the algorithm goes to [N-R-K](https://github.com/N-R-K).
 - Multiple ways to use ChibiHash:
   1. **Direct Hashing**: One-shot hashing using `chibi_hash64()`
   2. **Simple Hasher**: Basic implementation using `ChibiHasher` (implements `std::hash::Hasher`)
-  3. **Streaming Hasher**: Memory-efficient streaming with `StreamingChibiHasher` (implements `std::hash::Hasher`)
+  3. **Streaming Hasher**: Memory-efficient streaming with `StreamingChibiHasher` (implements `std::hash::Hasher`) - currently only available in `v1`
   4. **BuildHasher**: `ChibiHasher` implements `BuildHasher`. This allows using ChibiHash as the default hasher for `std::collections::HashMap` and `std::collections::HashSet`. Use `ChibiHashMap` and `ChibiHashSet` types.
+
 ## Example
 
 ```rust

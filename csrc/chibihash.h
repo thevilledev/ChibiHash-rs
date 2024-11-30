@@ -13,6 +13,8 @@
 #include <stddef.h>
 
 // Remove static inline and expose the function
-uint64_t chibihash64(const void *keyIn, ptrdiff_t len, uint64_t seed);
+uint64_t chibihash64_v1(const void *keyIn, ptrdiff_t len, uint64_t seed);
+uint64_t chibihash64_v2(const void *keyIn, ptrdiff_t len, uint64_t seed);
+
 
 #endif

@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v0.4.0] - 2024-11-30
+
+- Added `v2` version of the algorithm, available by importing `chibihash::v2::*`. Note that `v2` is missing `StreamingChibiHasher`.
+- Version `v1` is still the default version. If you import the crate without any version specifier, the `v1` version is used. This is to ensure backward compatibility.
+
 ## [v0.3.1] - 2024-11-26
 
 - Fixed `hashbrown` version

@@ -1,3 +1,5 @@
+// Benchmark the `v1` version of the algorithm
+
 #[cfg(feature = "ffi")]
 use criterion::{black_box, criterion_group, criterion_main, BenchmarkId, Criterion};
 #[cfg(feature = "ffi")]
