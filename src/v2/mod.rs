@@ -301,7 +301,7 @@ impl StreamingChibiHasher {
         h[0] ^= h[0] >> 31;
         h[1] = h[1].wrapping_add(h[0]);
 
-        let mut x = (self.total_len as u64).wrapping_mul(K);
+        let mut x = (self.total_len).wrapping_mul(K);
         x ^= x.rotate_left(29);
         x = x.wrapping_add(self.seed);
         x ^= h[1];
