@@ -2,9 +2,9 @@
 //!
 //! This crate provides a fast, non-cryptographic 64-bit hash function implementation
 //! based on the [ChibiHash algorithm](https://github.com/N-R-K/ChibiHash).
-//! 
+//!
 //! This is version `v2` of the algorithm. Notes from the original author:
-//! 
+//!
 //! - Faster performance on short string (42 cycles/hash vs 34 cycles/hash).
 //!   The tail end handling has been reworked entirely with some inspiration
 //!   from wyhash's short input reading.
@@ -52,15 +52,16 @@ use std::convert::TryInto;
 const K: u64 = 0x2B7E151628AED2A7; // digits of e
 
 pub fn chibi_hash64(key: &[u8], seed: u64) -> u64 {
-    
-    let seed2 = seed.wrapping_sub(K).rotate_left(15)
+    let seed2 = seed
+        .wrapping_sub(K)
+        .rotate_left(15)
         .wrapping_add(seed.wrapping_sub(K).rotate_left(47));
-    
+
     let mut h = [
         seed,
         seed.wrapping_add(K),
         seed2,
-        seed2.wrapping_add(K.wrapping_mul(K) ^ K)
+        seed2.wrapping_add(K.wrapping_mul(K) ^ K),
     ];
 
     let mut p = key;
@@ -93,15 +94,11 @@ pub fn chibi_hash64(key: &[u8], seed: u64) -> u64 {
         h[3] ^= load_u32_le(&p[l - 4..]);
     } else if l > 0 {
         h[2] ^= u64::from(p[0]);
-        h[3] ^= u64::from(p[l/2]) | (u64::from(p[l-1]) << 8);
+        h[3] ^= u64::from(p[l / 2]) | (u64::from(p[l - 1]) << 8);
     }
 
-    h[0] = h[0].wrapping_add(
-        (h[2].wrapping_mul(K)).rotate_left(31) ^ (h[2] >> 31)
-    );
-    h[1] = h[1].wrapping_add(
-        (h[3].wrapping_mul(K)).rotate_left(31) ^ (h[3] >> 31)
-    );
+    h[0] = h[0].wrapping_add((h[2].wrapping_mul(K)).rotate_left(31) ^ (h[2] >> 31));
+    h[1] = h[1].wrapping_add((h[3].wrapping_mul(K)).rotate_left(31) ^ (h[3] >> 31));
     h[0] = h[0].wrapping_mul(K);
     h[0] ^= h[0] >> 31;
     h[1] = h[1].wrapping_add(h[0]);

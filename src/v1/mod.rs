@@ -2,7 +2,7 @@
 //!
 //! This crate provides a fast, non-cryptographic 64-bit hash function implementation
 //! based on the [ChibiHash algorithm](https://github.com/N-R-K/ChibiHash).
-//! 
+//!
 //! This is version `v1` of the algorithm. This is currently the default.
 //!
 //! # Examples
@@ -337,7 +337,7 @@ mod tests {
         assert_eq!(hash, 0x8F922660063E3E75);
     }
 
-#[test]
+    #[test]
     fn test_basic_hashing() {
         let data = b"Hello, World!";
         let hash1 = chibi_hash64(data, 0);
@@ -433,6 +433,6 @@ mod tests {
             streaming.finalize(),
             0x5AF920D8C0EBFE9F,
             "Split streaming should match known value"
-            );
-        }
+        );
+    }
 }

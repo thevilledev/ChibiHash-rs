@@ -1,7 +1,7 @@
 //! Integration tests for the crate
 //! This ensures that the default implementation works as expected
 //! It will use the `v1` version of the algorithm
-use chibihash::{chibi_hash64, ChibiHasher, StreamingChibiHasher, ChibiHashMap, ChibiHashSet};
+use chibihash::{chibi_hash64, ChibiHashMap, ChibiHashSet, ChibiHasher, StreamingChibiHasher};
 use core::hash::{Hash, Hasher};
 
 #[test]
