@@ -32,7 +32,7 @@ The `v2` version will be the default in the next major version.
 - Multiple ways to use ChibiHash:
   1. **Direct Hashing**: One-shot hashing using `chibi_hash64()`
   2. **Simple Hasher**: Basic implementation using `ChibiHasher` (implements `std::hash::Hasher`)
-  3. **Streaming Hasher**: Memory-efficient streaming with `StreamingChibiHasher` (implements `std::hash::Hasher`) - currently only available in `v1`
+  3. **Streaming Hasher**: Memory-efficient streaming with `StreamingChibiHasher` (implements `std::hash::Hasher`)
   4. **BuildHasher**: `ChibiHasher` implements `BuildHasher`. This allows using ChibiHash as the default hasher for `std::collections::HashMap` and `std::collections::HashSet`. Use `ChibiHashMap` and `ChibiHashSet` types.
 
 ## Example
