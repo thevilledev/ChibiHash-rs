@@ -154,4 +154,4 @@ criterion_group!(
     bench_streaming_realistic
 );
 
-criterion_main!(benches); 
+criterion_main!(benches);
