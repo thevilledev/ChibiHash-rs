@@ -28,6 +28,9 @@ clean:
 bench:
 	RUSTFLAGS="-C opt-level=3 -C target-cpu=native" cargo bench --bench bench
 
+bench-v2:
+	RUSTFLAGS="-C opt-level=3 -C target-cpu=native" cargo bench --bench bench_v2
+
 bench-cross-lang:
 	RUSTFLAGS="-C opt-level=3 -C target-cpu=native" cargo bench --bench rust_vs_c --features ffi
 
