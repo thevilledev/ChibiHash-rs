@@ -1,6 +1,6 @@
 [package]
 name = "chibihash"
-version = "0.4.0"
+version = "0.5.0"
 edition = "2021"
 license = "MIT"
 authors = ["Ville Vesilehto <ville@vesilehto.fi>"]
@@ -37,6 +37,10 @@ codegen-units = 1
 
 [[bench]]
 name = "bench"
+harness = false
+
+[[bench]]
+name = "bench_v2"
 harness = false
 
 [[bench]]
