@@ -322,6 +322,9 @@ impl Hasher for StreamingChibiHasher {
 mod tests {
     use super::*;
 
+    #[cfg(not(feature = "std"))]
+    use alloc::string::{String, ToString};
+
     // Keep only internal implementation tests here
     #[test]
     fn test_load_u64_le() {

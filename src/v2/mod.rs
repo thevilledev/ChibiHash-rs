@@ -333,6 +333,9 @@ fn load_u32_le(bytes: &[u8]) -> u64 {
 mod tests {
     use super::*;
 
+    #[cfg(not(feature = "std"))]
+    use alloc::string::{String, ToString};
+
     // Keep only internal implementation tests here
     #[test]
     fn test_load_u64_le() {
