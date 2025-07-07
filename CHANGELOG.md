@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [v0.5.1] - 2025-07-07
+
+- Fixed no-std compatibility - thanks to [#19](https://github.com/thevilledev/ChibiHash-rs/pull/19) by [@AlexCharlton](https://github.com/AlexCharlton)!
+
 ## [v0.5.0] - 2025-01-08
 
 - Added `HashMap` and `HashSet` implementations to the `v2` version
@@ -60,7 +64,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added benchmarks
 - Released a crate
 
-[Unreleased]: https://github.com/thevilledev/ChibiHash-rs/compare/v0.4.0...HEAD
+[Unreleased]: https://github.com/thevilledev/ChibiHash-rs/compare/v0.5.1...HEAD
+[v0.5.1]: https://github.com/thevilledev/ChibiHash-rs/compare/v0.5.0...v0.5.1
+[v0.5.0]: https://github.com/thevilledev/ChibiHash-rs/compare/v0.4.0...v0.5.0
 [v0.4.0]: https://github.com/thevilledev/ChibiHash-rs/compare/v0.3.1...v0.4.0
 [v0.3.1]: https://github.com/thevilledev/ChibiHash-rs/compare/v0.3.0...v0.3.1
 [v0.3.0]: https://github.com/thevilledev/ChibiHash-rs/compare/v0.2.2...v0.3.0
