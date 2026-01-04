@@ -1,9 +1,11 @@
 // Benchmark the `v1` version of the algorithm
 
 #[cfg(feature = "ffi")]
-use criterion::{black_box, criterion_group, criterion_main, BenchmarkId, Criterion};
+use criterion::{criterion_group, criterion_main, BenchmarkId, Criterion};
 #[cfg(feature = "ffi")]
 use std::ffi::c_void;
+#[cfg(feature = "ffi")]
+use std::hint::black_box;
 
 // FFI declaration for the C implementation
 #[cfg(feature = "ffi")]

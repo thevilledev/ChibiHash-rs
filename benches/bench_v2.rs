@@ -1,7 +1,8 @@
 // Benchmark the `v2` version of the algorithm
 
 use chibihash::v2::{chibi_hash64, StreamingChibiHasher};
-use criterion::{black_box, criterion_group, criterion_main, BenchmarkId, Criterion};
+use criterion::{criterion_group, criterion_main, BenchmarkId, Criterion};
+use std::hint::black_box;
 
 fn bench_sizes(c: &mut Criterion) {
     let mut group = c.benchmark_group("v2_input_sizes");
