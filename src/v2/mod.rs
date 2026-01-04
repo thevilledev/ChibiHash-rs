@@ -58,12 +58,14 @@
 #[cfg(not(feature = "std"))]
 extern crate alloc;
 
-#[cfg(not(feature = "std"))]
+#[cfg(feature = "hashbrown")]
 use hashbrown::{HashMap as BaseHashMap, HashSet as BaseHashSet};
-#[cfg(feature = "std")]
+#[cfg(all(feature = "std", not(feature = "hashbrown")))]
 use std::collections::{HashMap as BaseHashMap, HashSet as BaseHashSet};
 
-#[cfg(not(feature = "std"))]
+#[cfg(all(not(feature = "std"), not(feature = "hashbrown")))]
+use core::hash::Hasher;
+#[cfg(all(not(feature = "std"), feature = "hashbrown"))]
 use core::hash::{BuildHasher, Hash, Hasher};
 #[cfg(feature = "std")]
 use std::hash::{BuildHasher, Hash, Hasher};
@@ -179,6 +181,7 @@ impl Hasher for ChibiHasher {
     }
 }
 
+#[cfg(any(feature = "std", feature = "hashbrown"))]
 impl BuildHasher for ChibiHasher {
     type Hasher = ChibiHasher;
 
@@ -188,9 +191,11 @@ impl BuildHasher for ChibiHasher {
 }
 
 /// A HashMap that uses ChibiHash by default
+#[cfg(any(feature = "std", feature = "hashbrown"))]
 pub type ChibiHashMap<K, V> = BaseHashMap<K, V, ChibiHasher>;
 
 /// A HashSet that uses ChibiHash by default
+#[cfg(any(feature = "std", feature = "hashbrown"))]
 pub type ChibiHashSet<T> = BaseHashSet<T, ChibiHasher>;
 
 /// Streaming ChibiHasher that processes data incrementally
@@ -333,7 +338,7 @@ fn load_u32_le(bytes: &[u8]) -> u64 {
 mod tests {
     use super::*;
 
-    #[cfg(not(feature = "std"))]
+    #[cfg(all(not(feature = "std"), feature = "hashbrown"))]
     use alloc::string::{String, ToString};
 
     // Keep only internal implementation tests here
@@ -350,7 +355,7 @@ mod tests {
     }
 
     #[test]
-    #[cfg(not(feature = "std"))]
+    #[cfg(all(not(feature = "std"), feature = "hashbrown"))]
     fn test_no_std() {
         let key = b"abcdefgh";
         let hash = chibi_hash64(key, 0);
@@ -376,6 +381,7 @@ mod tests {
     }
 
     #[test]
+    #[cfg(any(feature = "std", feature = "hashbrown"))]
     fn test_chibi_hash_map() {
         let mut map: ChibiHashMap<String, i32> = ChibiHashMap::default();
         map.insert("hello".to_string(), 42);
@@ -383,6 +389,7 @@ mod tests {
     }
 
     #[test]
+    #[cfg(any(feature = "std", feature = "hashbrown"))]
     fn test_chibi_hash_set() {
         let mut set: ChibiHashSet<String> = ChibiHashSet::default();
         set.insert("hello".to_string());
