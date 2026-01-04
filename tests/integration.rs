@@ -1,8 +1,12 @@
 //! Integration tests for the crate
 //! This ensures that the default implementation works as expected
 //! It will use the `v1` version of the algorithm
-use chibihash::{chibi_hash64, ChibiHashMap, ChibiHashSet, ChibiHasher, StreamingChibiHasher};
-use core::hash::{Hash, Hasher};
+use chibihash::{chibi_hash64, ChibiHasher, StreamingChibiHasher};
+#[cfg(any(feature = "std", feature = "hashbrown"))]
+use chibihash::{ChibiHashMap, ChibiHashSet};
+#[cfg(any(feature = "std", feature = "hashbrown"))]
+use core::hash::Hash;
+use core::hash::Hasher;
 
 #[test]
 fn test_default_basic_hashing() {
@@ -19,6 +23,7 @@ fn test_default_basic_hashing() {
 }
 
 #[test]
+#[cfg(any(feature = "std", feature = "hashbrown"))]
 fn test_default_hasher_trait() {
     let mut hasher1 = ChibiHasher::new(0);
     let mut hasher2 = ChibiHasher::new(0);
@@ -88,6 +93,7 @@ fn test_default_streaming_matches_direct() {
 }
 
 #[test]
+#[cfg(any(feature = "std", feature = "hashbrown"))]
 fn test_default_chibi_hash_map() {
     let mut map: ChibiHashMap<String, i32> = ChibiHashMap::default();
     map.insert("hello".to_string(), 42);
@@ -95,6 +101,7 @@ fn test_default_chibi_hash_map() {
 }
 
 #[test]
+#[cfg(any(feature = "std", feature = "hashbrown"))]
 fn test_default_chibi_hash_set() {
     let mut set: ChibiHashSet<String> = ChibiHashSet::default();
     set.insert("hello".to_string());

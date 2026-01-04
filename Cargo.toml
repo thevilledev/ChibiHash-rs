@@ -1,6 +1,6 @@
 [package]
 name = "chibihash"
-version = "0.5.1"
+version = "0.6.0"
 edition = "2021"
 license = "MIT"
 authors = ["Ville Vesilehto <ville@vesilehto.fi>"]
@@ -13,6 +13,7 @@ categories = ["algorithms", "no-std"]
 [dependencies.hashbrown]
 version = "0.16.1"
 default-features = false
+optional = true
 
 [dev-dependencies]
 criterion = { version = "0.8", features = ["html_reports"] }
@@ -24,6 +25,7 @@ cc = { version = "1.2.1", optional = true }
 ffi = ["cc"]
 default = ["std"]
 std = []
+hashbrown = ["dep:hashbrown"]
 
 [profile.release]
 opt-level = 3

@@ -38,8 +38,20 @@ jobs:
       - name: Format check
         run: make fmt-check
 
+      - name: Check compilation (std)
+        run: cargo check --features std
+
+      - name: Check compilation (no-std, zero deps)
+        run: cargo check --no-default-features
+
+      - name: Check compilation (hashbrown)
+        run: cargo check --no-default-features --features hashbrown
+
       - name: Test (std)
         run: make test-std
 
-      - name: Test (no-std)
+      - name: Test (no-std, zero deps)
         run: make test-no-std
+
+      - name: Test (hashbrown)
+        run: make test-hashbrown

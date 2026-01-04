@@ -27,13 +27,41 @@ The `v2` version will be the default in the next major version.
 - 64-bit hash function
 - Deterministic
 - Fast
-- No dependencies
-- `no-std` compatible
+- Zero dependencies possible (see [Feature Flags](#feature-flags))
+- `no_std` compatible
 - Multiple ways to use ChibiHash:
   1. **Direct Hashing**: One-shot hashing using `chibi_hash64()`
   2. **Simple Hasher**: Basic implementation using `ChibiHasher` (implements `std::hash::Hasher`)
   3. **Streaming Hasher**: Memory-efficient streaming with `StreamingChibiHasher` (implements `std::hash::Hasher`)
   4. **BuildHasher**: `ChibiHasher` implements `BuildHasher`. This allows using ChibiHash as the default hasher for `std::collections::HashMap` and `std::collections::HashSet`. Use `ChibiHashMap` and `ChibiHashSet` types.
+
+## Feature Flags
+
+| Feature | Default | Dependencies | `ChibiHashMap`/`ChibiHashSet` |
+|---------|---------|--------------|-------------------------------|
+| `std` | Yes | None | Yes (via `std::collections`) |
+| `hashbrown` | No | `hashbrown` | Yes (via `hashbrown`) |
+| *(none)* | - | **None** | No |
+
+### Usage Examples
+
+**Default (std)** - uses `std::collections`:
+```toml
+[dependencies]
+chibihash = "0.6"
+```
+
+**No-std with collections** - uses `hashbrown`:
+```toml
+[dependencies]
+chibihash = { version = "0.6", default-features = false, features = ["hashbrown"] }
+```
+
+**Zero dependencies** - just the hash function, no `ChibiHashMap`/`ChibiHashSet`:
+```toml
+[dependencies]
+chibihash = { version = "0.6", default-features = false }
+```
 
 ## Example
 

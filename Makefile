@@ -8,19 +8,25 @@ fmt:
 fmt-check:
 	cargo fmt --check
 
-test: test-std test-no-std
+test: test-std test-no-std test-hashbrown
 
 test-std:
 	@echo
-	@echo "*** Testing with default features ***"
+	@echo "*** Testing with std feature (default) ***"
 	@echo
 	@cargo test
 
 test-no-std:
 	@echo
-	@echo "*** Testing without default features ***"
+	@echo "*** Testing with no features (zero dependencies) ***"
 	@echo
-	@cargo test --no-default-features
+	@cargo test --no-default-features --lib --tests
+
+test-hashbrown:
+	@echo
+	@echo "*** Testing with hashbrown feature (no_std + collections) ***"
+	@echo
+	@cargo test --no-default-features --features hashbrown
 
 clean:
 	cargo clean
