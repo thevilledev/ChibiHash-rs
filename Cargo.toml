@@ -11,7 +11,7 @@ keywords = ["hash", "chibihash", "fast-hash", "non-cryptographic"]
 categories = ["algorithms", "no-std"]
 
 [dependencies.hashbrown]
-version = "0.16.1"
+version = "0.17.0"
 default-features = false
 optional = true
 
