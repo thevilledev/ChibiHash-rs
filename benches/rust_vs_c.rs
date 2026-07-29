@@ -10,7 +10,7 @@ use std::hint::black_box;
 // FFI declaration for the C implementation
 #[cfg(feature = "ffi")]
 extern "C" {
-    fn chibihash64(key: *const c_void, len: isize, seed: u64) -> u64;
+    fn chibihash64_v1(key: *const c_void, len: isize, seed: u64) -> u64;
 }
 
 #[cfg(feature = "ffi")]
@@ -54,7 +54,7 @@ fn bench_cross_language(c: &mut Criterion) {
                 &input,
                 |b, input| {
                     b.iter(|| unsafe {
-                        black_box(chibihash64(
+                        black_box(chibihash64_v1(
                             black_box(input.as_ptr() as *const c_void),
                             black_box(input.len() as isize),
                             black_box(0),
@@ -89,7 +89,7 @@ fn bench_cross_language(c: &mut Criterion) {
             &aligned_data[..*size],
             |b, input| unsafe {
                 b.iter(|| {
-                    black_box(chibihash64(
+                    black_box(chibihash64_v1(
                         black_box(input.as_ptr() as *const c_void),
                         black_box(input.len() as isize),
                         0,
@@ -103,7 +103,7 @@ fn bench_cross_language(c: &mut Criterion) {
             &unaligned_data[..*size],
             |b, input| unsafe {
                 b.iter(|| {
-                    black_box(chibihash64(
+                    black_box(chibihash64_v1(
                         black_box(input.as_ptr() as *const c_void),
                         black_box(input.len() as isize),
                         0,

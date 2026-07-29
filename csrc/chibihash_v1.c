@@ -20,7 +20,7 @@ chibihash64__load64le(const uint8_t *p)
 }
 
 uint64_t
-chibihash64(const void *keyIn, ptrdiff_t len, uint64_t seed)
+chibihash64_v1(const void *keyIn, ptrdiff_t len, uint64_t seed)
 {
 	const uint8_t *k = (const uint8_t *)keyIn;
 	ptrdiff_t l = len;
